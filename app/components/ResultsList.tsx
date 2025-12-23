@@ -17,7 +17,10 @@ type ResultsListProps = {
 export const ResultsList = ({ history }: ResultsListProps) => {
   return (
     <TableContainer component={Box} sx={{ mt: 2 }}>
-      <Table sx={{ maxWidth: 600, mx: 'auto' }} aria-label="Game results table">
+      <Table
+        sx={{ maxWidth: '600px', minWidth: '320px', width: '90%', mx: 'auto' }}
+        aria-label="Game results table"
+      >
         <TableHead>
           <TableRow>
             <TableCell

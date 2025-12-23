@@ -13,7 +13,9 @@ export const GameAlert = ({ isWin, message, onClose }: GameAlertProps) => {
       severity={isWin ? 'success' : 'error'}
       onClick={onClose}
       sx={{
-        width: 600,
+        maxWidth: '600px',
+        minWidth: '320px',
+        width: '80%',
         position: 'absolute',
         top: '16px',
         justifySelf: 'center',
