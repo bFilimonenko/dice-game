@@ -1,62 +1,58 @@
 'use client';
 
-import { GameBoard } from '@/app/components/GameBoard';
-import { BasicTable } from '@/app/components/ResultsList';
-import { Alert, AlertTitle } from '@mui/material';
 import { useState } from 'react';
-
-export type HistoryItem = {
-  time: string;
-  guess: string;
-  result: number;
-  win: boolean;
-};
+import { Box } from '@mui/material';
+import { GameBoard } from '@/app/components/GameBoard';
+import { ResultsList } from '@/app/components/ResultsList';
+import { GameAlert } from '@/app/components/GameAlert';
+import { HistoryItem, Choice, MAX_HISTORY_ITEMS } from '@/app/utils';
 
 export default function Home() {
   const [threshold, setThreshold] = useState<number>(20);
   const [guess, setGuess] = useState<number>(20);
-  const [choice, setChoice] = useState<'under' | 'over'>('under');
-  const [result, setResult] = useState<number | null>(null);
+  const [choice, setChoice] = useState<Choice>('under');
+  const [gameResult, setGameResult] = useState<boolean | null>(null);
+  const [resultMessage, setResultMessage] = useState<string>('');
   const [history, setHistory] = useState<HistoryItem[]>([]);
 
   const playGame = (randomNum: number) => {
-    setResult(randomNum);
-    console.log('res', result);
-    const didWin = choice === 'under' ? randomNum < guess : randomNum > guess;
+    let didWin: boolean;
+    let message: string;
 
-    // if(randomNum)
-    console.log('didWin', didWin);
+    if (randomNum === guess) {
+      // Equal numbers - user loses
+      didWin = false;
+      message = 'Numbers are equal!';
+    } else if (choice === 'under') {
+      didWin = randomNum < guess;
+      message = didWin ? '' : 'Number was higher';
+    } else {
+      didWin = randomNum > guess;
+      message = didWin ? '' : 'Number was lower';
+    }
+
+    setGameResult(didWin);
+    setResultMessage(message);
+
     const newHistoryItem: HistoryItem = {
       time: new Date().toLocaleTimeString(),
-      guess: choice + ' ' + guess,
+      guess: `${choice.charAt(0).toUpperCase() + choice.slice(1)} ${guess}`,
       result: randomNum,
       win: didWin,
     };
 
-    console.log(newHistoryItem);
+    setHistory((prev) => [newHistoryItem, ...prev].slice(0, MAX_HISTORY_ITEMS));
+  };
 
-    setHistory((prev) => [newHistoryItem, ...prev].slice(0, 10));
-    console.log('history', history);
+  const handleAlertClick = () => {
+    setGameResult(null);
   };
 
   return (
-    <main>
-      <Alert
-        variant="filled"
-        severity="success"
-        sx={{ maxWidth: 600, marginInline: 'auto', marginBottom: 4 }}
-      >
-        <AlertTitle>You win</AlertTitle>
-      </Alert>
-
-      <Alert
-        variant="filled"
-        severity="error"
-        sx={{ maxWidth: 600, marginInline: 'auto', marginBottom: 4 }}
-      >
-        <AlertTitle>You lost</AlertTitle>
-        Number was {choice === 'under' ? 'higher' : 'lower'}
-      </Alert>
+    <Box sx={{ py: '113px' }} component="main">
+      {gameResult !== null && (
+        <GameAlert isWin={gameResult} message={resultMessage} onClose={handleAlertClick} />
+      )}
 
       <GameBoard
         threshold={threshold}
@@ -67,7 +63,8 @@ export default function Home() {
         setChoice={setChoice}
         onPlay={playGame}
       />
-      <BasicTable history={history} />
-    </main>
+
+      {history.length > 0 && <ResultsList history={history} />}
+    </Box>
   );
 }
