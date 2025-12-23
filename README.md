@@ -40,6 +40,7 @@ This is a number guessing game where players try to predict whether a randomly g
 1. Clone the repository:
 ```bash
 git clone https://github.com/bFilimonenko/dice-game.git
+cd dice-game
 ```
 
 2. Install dependencies:
